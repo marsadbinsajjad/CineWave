@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Movie / Series</title>
+  <link rel="stylesheet" href="/styles/styles.css" />
+</head>
+<body>
+
+  <div class="form-container">
+    <form action="/add" method="POST" class="add-book-form">
+      <h2>+ Add New Title</h2>
+
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="e.g. John Wick, Breaking Bad" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="type">Type</label>
+          <select id="type" name="type" required>
+            <option value="Movie">Movie</option>
+            <option value="Series">Series</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category / Genre</label>
+          <select id="category" name="category" required>
+            <option value="Action / Fighting">Action / Fighting</option>
+            <option value="Sci-Fi / Fiction">Sci-Fi / Fiction</option>
+            <option value="Drama">Drama</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Horror">Horror</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Anime">Anime</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="status">Watch Status</label>
+          <select id="status" name="status" required>
+            <option value="Watched">Watched</option>
+            <option value="Not Watched">Not Watched</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="rating">Rating (1 to 5 Stars)</label>
+          <select id="rating" name="rating">
+            <option value="5">★★★★★ (5/5)</option>
+            <option value="4">★★★★☆ (4/5)</option>
+            <option value="3">★★★☆☆ (3/5)</option>
+            <option value="2">★★☆☆☆ (2/5)</option>
+            <option value="1">★☆☆☆☆ (1/5)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Review / Notes</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Write your thoughts or synopsis..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a href="/" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-submit">Save Entry</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

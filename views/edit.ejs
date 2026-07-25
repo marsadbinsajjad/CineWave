@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Title | CineWave</title>
+  <link rel="stylesheet" href="/styles/styles.css" />
+</head>
+<body>
+
+  <div class="form-container">
+    <form action="/edit/<%= item.id %>" method="POST" class="add-book-form">
+      <h2>✏️ Edit Title</h2>
+
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          value="<%= item.title %>" 
+          required 
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="type">Type</label>
+          <select id="type" name="type" required>
+            <option value="Movie" <%= item.type === 'Movie' ? 'selected' : '' %>>Movie</option>
+            <option value="Series" <%= item.type === 'Series' ? 'selected' : '' %>>Series</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category / Genre</label>
+          <select id="category" name="category" required>
+            <% const categories = ["Action / Fighting", "Sci-Fi / Fiction", "Drama", "Comedy", "Horror", "Thriller", "Anime"]; %>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat %>" <%= item.category === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="status">Watch Status</label>
+          <select id="status" name="status" required>
+            <option value="Watched" <%= item.status === 'Watched' ? 'selected' : '' %>>Watched</option>
+            <option value="Not Watched" <%= item.status === 'Not Watched' ? 'selected' : '' %>>Not Watched</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="rating">Rating (1 to 5 Stars)</label>
+          <select id="rating" name="rating">
+            <option value="5" <%= Number(item.rating) === 5 ? 'selected' : '' %>>★★★★★ (5/5)</option>
+            <option value="4" <%= Number(item.rating) === 4 ? 'selected' : '' %>>★★★★☆ (4/5)</option>
+            <option value="3" <%= Number(item.rating) === 3 ? 'selected' : '' %>>★★★☆☆ (3/5)</option>
+            <option value="2" <%= Number(item.rating) === 2 ? 'selected' : '' %>>★★☆☆☆ (2/5)</option>
+            <option value="1" <%= Number(item.rating) === 1 ? 'selected' : '' %>>★☆☆☆☆ (1/5)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Review / Notes</label>
+        <textarea id="notes" name="notes" rows="3"><%= item.notes || '' %></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a href="/" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-submit">Update Entry</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>
