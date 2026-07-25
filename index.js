@@ -8,13 +8,26 @@ const port = 3000;
 // ==========================================================================
 // 1. PostgreSQL Database Configuration
 // ==========================================================================
-const db = new pg.Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "movies/series",
-  password: "0321", // ⚠️ Replace with your actual database password
-  port: 5432,
-});
+
+
+const db = new pg.Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }, // Required for Railway Cloud DB
+      }
+    : {
+        user: "postgres",
+        host: "localhost",
+        database: "movies/series",
+        password: "0321",
+        port: 5432,
+      }
+);
+
+db.connect()
+  .then(() => console.log("⚡ Connected to PostgreSQL!"))
+  .catch((err) => console.error("❌ Database connection error:", err.stack));
 
 db.connect()
   .then(() => console.log("⚡ Connected to PostgreSQL database successfully!"))
