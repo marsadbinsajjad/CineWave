@@ -1,65 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CineWave | Movies & Series Tracker</title>
-  <link rel="stylesheet" href="/styles/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineWave - Media Tracker</title>
   <link rel="icon" type="image/png" href="/favicon.png?v=2">
+  <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
 
-  <!-- Background Interactive Canvas -->
-  <canvas id="canvas-lines"></canvas>
-
   <header>
-    <h1>🎬 CineWave Tracker</h1>
-    <p>Keep track of movies, series, categories, and watch status</p>
-    <a href="/new" class="btn-add">+ Add Movie / Series</a>
+    <h1>🎬 CineWave</h1>
+    <p>Your Personal Movie & TV Series Tracker</p>
+    
+    <% if (locals.user) { %>
+      <div class="user-bar">
+        <span>Logged in as: <strong><%= user.name || user.email %></strong></span>
+        <a href="/logout" class="btn-logout">Logout</a>
+      </div>
+    <% } %>
+
+    <a href="/new" class="btn-add">+ Add Movie or Series</a>
   </header>
 
   <main class="books-container">
     <% if (mediaList.length === 0) { %>
-      <p class="empty-msg">No movies or series added yet. Click above to add your first title!</p>
+      <div class="empty-msg">
+        <p>Your watchlist is currently empty. Click above to add your first movie or series!</p>
+      </div>
     <% } else { %>
       <div class="books-grid">
         <% mediaList.forEach(item => { %>
           <div class="book-details">
-            <!-- Title & Type Badge -->
             <div class="card-header">
               <h2><%= item.title %></h2>
               <span class="badge-type"><%= item.type %></span>
             </div>
 
-            <!-- Category & Watch Status Badges -->
             <div class="badges-row">
-              <span class="badge-category">🏷️ <%= item.category %></span>
+              <span class="badge-category"><%= item.category %></span>
               <span class="badge-status <%= item.status === 'Watched' ? 'status-watched' : 'status-unwatched' %>">
-                <%= item.status === 'Watched' ? '✓ Watched' : '⏳ Not Watched' %>
+                <%= item.status %>
               </span>
             </div>
 
-            <!-- Meta info: Rating -->
             <div class="meta">
-              <span class="rating">
+              <div class="rating">
                 <% for(let i = 0; i < item.rating; i++) { %>★<% } %>
                 <% for(let i = item.rating; i < 5; i++) { %>☆<% } %>
-              </span>
+              </div>
             </div>
 
-            <!-- Notes -->
             <% if (item.notes) { %>
               <div class="notes">
-                <h4>Review / Thoughts</h4>
+                <h4>Notes</h4>
                 <p><%= item.notes %></p>
               </div>
             <% } %>
 
-            <!-- Actions -->
             <div class="card-actions">
               <a href="/edit/<%= item.id %>" class="btn-edit">Edit</a>
-              <form action="/delete/<%= item.id %>" method="POST" style="display:inline;">
-                <button type="submit" class="btn-delete" onclick="return confirm('Delete this title?')">Delete</button>
+              <form action="/delete/<%= item.id %>" method="POST" style="display: inline;">
+                <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
               </form>
             </div>
           </div>
@@ -68,152 +70,5 @@
     <% } %>
   </main>
 
-  <!-- Interactive High-Speed Canvas Engine Script -->
-  <script>
-    (function () {
-      const canvas = document.getElementById("canvas-lines");
-      const ctx = canvas.getContext("2d");
-
-      let width, height;
-      let particles = [];
-      let hueOffset = 0;
-      
-      const mouse = { x: null, y: null, radius: 420 };
-
-      function initCanvas() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-        const count = Math.floor((width * height) / 15000);
-        particles = [];
-        
-        for (let i = 0; i < count; i++) {
-          particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: (Math.random() - 0.5) * 3.8,
-            vy: (Math.random() - 0.5) * 3.8,
-            radius: Math.random() * 2.5 + 2,
-            pulse: Math.random() * Math.PI
-          });
-        }
-      }
-
-      window.addEventListener("pointermove", (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-
-      window.addEventListener("mouseleave", () => {
-        mouse.x = null;
-        mouse.y = null;
-      });
-
-      window.addEventListener("resize", initCanvas);
-
-      function animate() {
-        ctx.clearRect(0, 0, width, height);
-        hueOffset = (hueOffset + 0.8) % 360;
-
-        for (let i = 0; i < particles.length; i++) {
-          let p = particles[i];
-          p.pulse += 0.08;
-          let currentRadius = p.radius + Math.sin(p.pulse) * 0.8;
-
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
-
-          if (mouse.x !== null && mouse.y !== null) {
-            let mdx = p.x - mouse.x;
-            let mdy = p.y - mouse.y;
-            let mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-
-            if (mdist < mouse.radius) {
-              let force = (1 - mdist / mouse.radius) * 0.15;
-              p.x -= (mdx / mdist) * force * 12;
-              p.y -= (mdy / mdist) * force * 12;
-            }
-          }
-
-          ctx.save();
-          ctx.shadowBlur = 10;
-          ctx.shadowColor = `hsl(${hueOffset + i * 2}, 100%, 65%)`;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, Math.max(1, currentRadius), 0, Math.PI * 2);
-          ctx.fillStyle = `hsl(${hueOffset + i * 2}, 100%, 75%)`;
-          ctx.fill();
-          ctx.restore();
-
-          const maxNodeDist = 180;
-          for (let j = i + 1; j < particles.length; j++) {
-            let p2 = particles[j];
-            let dx = p.x - p2.x;
-            let dy = p.y - p2.y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < maxNodeDist) {
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              let alpha = (1 - dist / maxNodeDist) * 0.55;
-              ctx.strokeStyle = `hsla(${hueOffset}, 100%, 60%, ${alpha})`;
-              ctx.lineWidth = 1.3;
-              ctx.stroke();
-            }
-          }
-
-          if (mouse.x !== null && mouse.y !== null) {
-            let mdx = p.x - mouse.x;
-            let mdy = p.y - mouse.y;
-            let mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-
-            if (mdist < mouse.radius) {
-              let alpha = (1 - mdist / mouse.radius);
-              ctx.save();
-              ctx.shadowBlur = 12;
-              ctx.shadowColor = `hsl(${(hueOffset + 180) % 360}, 100%, 60%)`;
-
-              let grad = ctx.createLinearGradient(p.x, p.y, mouse.x, mouse.y);
-              grad.addColorStop(0, `hsla(${hueOffset}, 100%, 65%, ${alpha * 0.9})`);
-              grad.addColorStop(1, `hsla(${(hueOffset + 120) % 360}, 100%, 70%, ${alpha * 0.95})`);
-
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(mouse.x, mouse.y);
-              ctx.strokeStyle = grad;
-              ctx.lineWidth = 2.4;
-              ctx.stroke();
-              ctx.restore();
-            }
-          }
-        }
-
-        if (mouse.x !== null && mouse.y !== null) {
-          ctx.save();
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = `hsl(${hueOffset}, 100%, 60%)`;
-          
-          ctx.beginPath();
-          ctx.arc(mouse.x, mouse.y, 14 + Math.sin(Date.now() * 0.01) * 3, 0, Math.PI * 2);
-          ctx.strokeStyle = `hsl(${hueOffset}, 100%, 70%)`;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.arc(mouse.x, mouse.y, 4, 0, Math.PI * 2);
-          ctx.fillStyle = "#ffffff";
-          ctx.fill();
-          ctx.restore();
-        }
-
-        requestAnimationFrame(animate);
-      }
-
-      initCanvas();
-      animate();
-    })();
-  </script>
 </body>
 </html>

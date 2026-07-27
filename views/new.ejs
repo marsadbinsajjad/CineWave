@@ -1,42 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Movie / Series</title>
-  <link rel="stylesheet" href="/styles/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineWave - Add Title</title>
+  <link rel="icon" type="image/png" href="/favicon.png?v=2">
+  <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
 
+  <header>
+    <h1>🎬 CineWave</h1>
+    <p>Add a new item to your watchlist</p>
+  </header>
+
   <div class="form-container">
     <form action="/add" method="POST" class="add-book-form">
-      <h2>+ Add New Title</h2>
+      <h2>Add New Entry</h2>
 
       <div class="form-group">
         <label for="title">Title</label>
-        <input type="text" id="title" name="title" placeholder="e.g. John Wick, Breaking Bad" required />
+        <input type="text" id="title" name="title" placeholder="e.g. Inception, Breaking Bad" required>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="type">Type</label>
+          <label for="type">Media Type</label>
           <select id="type" name="type" required>
             <option value="Movie">Movie</option>
-            <option value="Series">Series</option>
+            <option value="Series">TV Series</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="category">Category / Genre</label>
-          <select id="category" name="category" required>
-            <option value="Action / Fighting">Action / Fighting</option>
-            <option value="Sci-Fi / Fiction">Sci-Fi / Fiction</option>
-            <option value="Drama">Drama</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Horror">Horror</option>
-            <option value="Thriller">Thriller</option>
-            <option value="Anime">Anime</option>
-          </select>
+          <label for="category">Genre</label>
+          <input type="text" id="category" name="category" placeholder="e.g. Sci-Fi, Drama" required>
         </div>
       </div>
 
@@ -52,18 +50,18 @@
         <div class="form-group">
           <label for="rating">Rating (1 to 5 Stars)</label>
           <select id="rating" name="rating">
-            <option value="5">★★★★★ (5/5)</option>
-            <option value="4">★★★★☆ (4/5)</option>
-            <option value="3">★★★☆☆ (3/5)</option>
-            <option value="2">★★☆☆☆ (2/5)</option>
-            <option value="1">★☆☆☆☆ (1/5)</option>
+            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+            <option value="4">⭐⭐⭐⭐ (4/5)</option>
+            <option value="3">⭐⭐⭐ (3/5)</option>
+            <option value="2">⭐⭐ (2/5)</option>
+            <option value="1">⭐ (1/5)</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="notes">Review / Notes</label>
-        <textarea id="notes" name="notes" rows="3" placeholder="Write your thoughts or synopsis..."></textarea>
+        <label for="notes">Notes / Review</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Add thoughts, favorite scenes, or season tracking..."></textarea>
       </div>
 
       <div class="form-actions">

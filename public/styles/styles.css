@@ -173,6 +173,30 @@ header p {
   box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
 }
 
+/* User Account Header Info */
+.user-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.btn-logout {
+  color: #f87171;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.btn-logout:hover {
+  color: #fca5a5;
+  text-decoration: underline;
+}
+
 /* ==========================================================================
    5. CONTAINER & CARDS GRID
    ========================================================================== */
@@ -380,7 +404,7 @@ header p {
 }
 
 /* ==========================================================================
-   7. FORM PAGES (New & Edit Views)
+   7. FORM PAGES (New, Edit, Login & Register Views)
    ========================================================================== */
 .form-container {
   width: 100%;
@@ -390,7 +414,8 @@ header p {
   margin-top: 1rem;
 }
 
-.add-book-form {
+.add-book-form,
+.auth-card {
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -403,7 +428,14 @@ header p {
   gap: 1.35rem;
 }
 
-.add-book-form h2 {
+.auth-card {
+  text-align: center;
+  width: 100%;
+  max-width: 440px;
+}
+
+.add-book-form h2,
+.auth-card h2 {
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--text-bright);
@@ -428,7 +460,8 @@ header p {
 
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.auth-card input {
   width: 100%;
   padding: 0.8rem 1rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -441,7 +474,6 @@ header p {
   transition: all 0.2s ease;
 }
 
-/* Styled options dropdown for selects */
 .form-group select option {
   background-color: #0a101e;
   color: var(--text-bright);
@@ -449,7 +481,8 @@ header p {
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.auth-card input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 15px var(--accent-glow);
   background-color: rgba(0, 0, 0, 0.6);
@@ -492,11 +525,53 @@ header p {
   cursor: pointer;
   box-shadow: 0 0 15px var(--accent-glow);
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .btn-submit:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 25px rgba(14, 165, 233, 0.5);
+}
+
+/* Auth Buttons & Dividers */
+.google-btn {
+  background: #ea4335;
+  color: white;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: block;
+  transition: all 0.2s ease;
+}
+
+.google-btn:hover {
+  background: #d93025;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(234, 67, 53, 0.4);
+}
+
+.divider {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.auth-footer {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -511,7 +586,8 @@ header p {
     grid-template-columns: 1fr;
   }
 
-  .add-book-form {
+  .add-book-form,
+  .auth-card {
     padding: 1.5rem;
   }
 }
