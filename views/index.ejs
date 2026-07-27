@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineWave - Media Tracker</title>
-  <link rel="icon" type="image/png" href="/favicon.png?v=2">
-  <link rel="stylesheet" href="/styles/style.css">
-</head>
-<body>
-
+<%- include('partials/header') %>
   <header>
     <h1>🎬 CineWave</h1>
     <p>Your Personal Movie & TV Series Tracker</p>
@@ -70,5 +60,114 @@
     <% } %>
   </main>
 
+  <!-- Constellation Network Cursor Script -->
+  <script>
+    const canvas = document.getElementById('canvas-lines');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    // Track mouse coordinates
+    const mouse = {
+      x: width / 2,
+      y: height / 2,
+      radius: 220 // Interactive constellation radius
+    };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    // Create star nodes
+    const particleCount = 65;
+    const particles = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.7,
+      vy: (Math.random() - 0.5) * 0.7,
+      radius: Math.random() * 1.8 + 1,
+      baseAlpha: Math.random() * 0.5 + 0.4
+    }));
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw glowing core at cursor center
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.9)';
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = '#0ea5e9';
+      ctx.fill();
+      ctx.shadowBlur = 0; // Reset shadow glow
+
+      particles.forEach((p, i) => {
+        // Move particles along ambient drift
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce off screen borders
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        // Distance calculation to cursor
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const distToCursor = Math.hypot(dx, dy);
+
+        // Gravitational pull towards cursor when within active range
+        if (distToCursor < mouse.radius) {
+          const force = (mouse.radius - distToCursor) / mouse.radius;
+          p.x += (dx / distToCursor) * force * 1.8;
+          p.y += (dy / distToCursor) * force * 1.8;
+        }
+
+        // Draw Star Node
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(186, 230, 253, ${p.baseAlpha})`;
+        ctx.fill();
+
+        // Connect Star to Cursor (Primary Constellation Lines)
+        if (distToCursor < mouse.radius) {
+          const lineAlpha = (1 - distToCursor / mouse.radius) * 0.75;
+          ctx.strokeStyle = `rgba(14, 165, 233, ${lineAlpha})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.stroke();
+        }
+
+        // Connect Star to Neighbor Stars (Inter-Star Network)
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const distBetween = Math.hypot(p.x - p2.x, p.y - p2.y);
+
+          if (distBetween < 110) {
+            const neighborAlpha = 0.3 * (1 - distBetween / 110);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${neighborAlpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+  <%- include('partials/footer') %>
 </body>
 </html>

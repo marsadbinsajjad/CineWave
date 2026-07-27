@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineWave - Add Title</title>
-  <link rel="icon" type="image/png" href="/favicon.png?v=2">
-  <link rel="stylesheet" href="/styles/style.css">
-</head>
-<body>
-
+<%- include('partials/header') %>
   <header>
     <h1>🎬 CineWave</h1>
     <p>Add a new item to your watchlist</p>
@@ -43,7 +33,7 @@
           <label for="status">Watch Status</label>
           <select id="status" name="status" required>
             <option value="Watched">Watched</option>
-            <option value="Not Watched">Not Watched</option>
+            <option value="Not Watched" selected>Not Watched</option>
           </select>
         </div>
 
@@ -70,6 +60,6 @@
       </div>
     </form>
   </div>
-
+<%- include('partials/footer') %>
 </body>
 </html>

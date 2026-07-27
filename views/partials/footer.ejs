@@ -1,0 +1,113 @@
+<!-- Vibrant Gradient Constellation Script -->
+  <script>
+    const canvas = document.getElementById('canvas-lines');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const mouse = {
+      x: width / 2,
+      y: height / 2,
+      radius: 250
+    };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    const particleCount = 200;
+    const particles = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      radius: Math.random() * 1.6 + 0.8,
+      baseAlpha: Math.random() * 0.6 + 0.4
+    }));
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Glowing multi-layer core at cursor center
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#38bdf8';
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#0ea5e9';
+      ctx.fill();
+      ctx.shadowBlur = 0; // Clear blur for loop performance
+
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Screen edge wrapping
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const distToCursor = Math.hypot(dx, dy);
+
+        // Magnetic attraction to cursor
+        if (distToCursor < mouse.radius) {
+          const force = (mouse.radius - distToCursor) / mouse.radius;
+          p.x += (dx / distToCursor) * force * 1.6;
+          p.y += (dy / distToCursor) * force * 1.6;
+        }
+
+        // Draw Star Node
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(186, 230, 253, ${p.baseAlpha})`;
+        ctx.fill();
+
+        // 🌟 Gradient & Glowing Lines to Mouse Cursor
+        if (distToCursor < mouse.radius) {
+          const intensity = 1 - distToCursor / mouse.radius;
+          
+          // Create gradient from star (Cyan) to cursor (Neon Purple)
+          const gradient = ctx.createLinearGradient(p.x, p.y, mouse.x, mouse.y);
+          gradient.addColorStop(0, `rgba(56, 189, 248, ${intensity * 0.9})`);
+          gradient.addColorStop(0.5, `rgba(14, 165, 233, ${intensity * 0.7})`);
+          gradient.addColorStop(1, `rgba(192, 132, 252, ${intensity * 0.95})`);
+
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = intensity * 1.8 + 0.4; // Thicker lines closer to cursor
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.stroke();
+        }
+
+        // 🕸️ Inter-Star Web Connections
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const distBetween = Math.hypot(p.x - p2.x, p.y - p2.y);
+
+          if (distBetween < 80) {
+            const opacity = 0.28 * (1 - distBetween / 80);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${opacity})`;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
