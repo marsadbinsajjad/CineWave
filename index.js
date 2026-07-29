@@ -31,8 +31,59 @@ const db = new pg.Pool(
       }
 );
 
+// ==========================================
+// AUTO-CREATE DATABASE TABLES ON STARTUP
+// ==========================================
+async function initDB() {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password VARCHAR(255),
+          google_id VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS media (
+          id SERIAL PRIMARY KEY,
+          user_id INT REFERENCES users(id) ON DELETE CASCADE,
+          title VARCHAR(255) NOT NULL,
+          type VARCHAR(50) NOT NULL,
+          category VARCHAR(50),
+          status VARCHAR(50) NOT NULL,
+          rating INT DEFAULT 1,
+          notes TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS "user_sessions" (
+        "sid" varchar NOT NULL COLLATE "default",
+        "sess" json NOT NULL,
+        "expire" timestamp(6) NOT NULL
+      ) WITH (OIDS=FALSE);
+
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'session_pkey') THEN
+            ALTER TABLE "user_sessions" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+        END IF;
+      END $$;
+
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "user_sessions" ("expire");
+    `);
+    console.log("✅ Database tables verified/created successfully!");
+  } catch (err) {
+    console.error("❌ Error initializing database tables:", err);
+  }
+}
+
 db.connect()
-  .then(() => console.log("⚡ Connected to PostgreSQL database successfully!"))
+  .then(() => {
+    console.log("⚡ Connected to PostgreSQL database successfully!");
+    initDB(); // Run auto-migration function after connecting
+  })
   .catch(err => console.error("Database connection error:", err));
 
 // Configure PG Session Store
