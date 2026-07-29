@@ -109,10 +109,9 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
-      userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo',
+      callbackURL: process.env.GOOGLE_CALLBACK_URL, // <--- MAKE SURE THIS MATCHES YOUR VARIABLE NAME
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (accessToken, refreshToken, profile, cb) => {
       try {
         const email = profile.emails[0].value;
         const name = profile.displayName;
