@@ -12,12 +12,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.process?.env?.PORT || process.env.PORT || 8080;
 const saltRounds = 10;
 
 // PostgreSQL Connection Pool Setup
-import pg from 'pg';
-
 const db = new pg.Pool(
   process.env.DATABASE_URL
     ? {
@@ -25,7 +23,6 @@ const db = new pg.Pool(
         ssl: { rejectUnauthorized: false }, // Required for Railway PostgreSQL
       }
     : {
-        // Fallback for local testing on your machine
         user: process.env.DB_USER,
         host: process.env.DB_HOST,
         database: process.env.DB_NAME,
@@ -33,8 +30,6 @@ const db = new pg.Pool(
         port: process.env.DB_PORT,
       }
 );
-
-export default db;
 
 db.connect()
   .then(() => console.log("⚡ Connected to PostgreSQL database successfully!"))
@@ -55,7 +50,7 @@ app.use(
       pool: db,
       tableName: 'user_sessions',
     }),
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'fallback_secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -121,7 +116,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL, // <--- MAKE SURE THIS MATCHES YOUR VARIABLE NAME
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, cb) => {
       try {
@@ -137,16 +132,16 @@ passport.use(
             'INSERT INTO users (name, email, google_id) VALUES ($1, $2, $3) RETURNING *',
             [name, email, googleId]
           );
-          return done(null, newUser.rows[0]);
+          return cb(null, newUser.rows[0]);
         } else {
           // Update google_id if existing account used password previously
           if (!result.rows[0].google_id) {
             await db.query('UPDATE users SET google_id = $1 WHERE email = $2', [googleId, email]);
           }
-          return done(null, result.rows[0]);
+          return cb(null, result.rows[0]);
         }
       } catch (err) {
-        return done(err);
+        return cb(err);
       }
     }
   )
@@ -260,11 +255,8 @@ app.get('/new', checkAuthenticated, (req, res) => {
 });
 
 // POST Create New Item Action
-// POST Create New Item Action
 app.post('/add', checkAuthenticated, async (req, res) => {
   const { title, type, category, status, rating, notes } = req.body;
-
-  // Ensure rating defaults to a valid integer (1-5)
   const parsedRating = rating ? parseInt(rating, 10) : 5;
 
   try {
@@ -272,8 +264,6 @@ app.post('/add', checkAuthenticated, async (req, res) => {
       'INSERT INTO media (user_id, title, type, category, status, rating, notes) VALUES ($1, $2, $3, $4, $5, $6, $7)',
       [req.user.id, title, type, category, status, parsedRating, notes || '']
     );
-    
-    // Successfully inserted — redirect to main dashboard grid
     res.redirect('/');
   } catch (err) {
     console.error("❌ Database error while adding item:", err.message);
@@ -302,12 +292,10 @@ app.get('/edit/:id', checkAuthenticated, async (req, res) => {
 });
 
 // POST Update Item Action
-// POST Update Item Action
 app.post('/edit/:id', checkAuthenticated, async (req, res) => {
   const { id } = req.params;
   const { title, type, category, status, rating, notes } = req.body;
 
-  // Ensure values are properly formatted
   const parsedId = parseInt(id, 10);
   const parsedRating = rating ? parseInt(rating, 10) : 1;
 
@@ -327,6 +315,7 @@ app.post('/edit/:id', checkAuthenticated, async (req, res) => {
     res.redirect('/');
   }
 });
+
 // POST Delete Item Action
 app.post('/delete/:id', checkAuthenticated, async (req, res) => {
   const { id } = req.params;
