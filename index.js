@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const port = process.process?.env?.PORT || process.env.PORT || 8080;
+const port = process.process?.env?.PORT || process.env.PORT || 3000;
 const saltRounds = 10;
 
 // PostgreSQL Connection Pool Setup
