@@ -16,13 +16,25 @@ const port = process.env.PORT || 8080;
 const saltRounds = 10;
 
 // PostgreSQL Connection Pool Setup
-const db = new pg.Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-});
+import pg from 'pg';
+
+const db = new pg.Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }, // Required for Railway PostgreSQL
+      }
+    : {
+        // Fallback for local testing on your machine
+        user: process.env.DB_USER,
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        password: process.env.DB_PASSWORD,
+        port: process.env.DB_PORT,
+      }
+);
+
+export default db;
 
 db.connect()
   .then(() => console.log("⚡ Connected to PostgreSQL database successfully!"))
